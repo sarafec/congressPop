@@ -8,23 +8,16 @@ function getData(){
 			return createInitialElems(data);
 		} else {
 			console.log('error!');
-
-	}
-};
+		}
+	};
 	request.onerror = function() {
 		console.log('connection error!');
 	};
-
 	request.send();
 }
 
 /** CONSTANTS **/
-let margin = {
-	top: 70,
-	right: 20,
-	bottom: 40,
-	left: 50
-};
+let margin = { top: 70, right: 20, bottom: 40, left: 50 };
 
 let constant = {
 	width: 600 - margin.left - margin.right,
@@ -47,15 +40,19 @@ function createInitialElems(data) {
 	
 	// create initial chart
 	createStackChart(data, g);
-
 }
 
+// create visual elements for stack chart
 function createStackChart(data, g) {
 	createMajorityBar(data, g);
 	createMinorityBar(data, g);
 }
 
-function createGroupChart(data) {
+// create visual elements for grouped chart
+function createGroupChart(data, g) {
+	createMaleBar(data, g);
+	createFemaleBar(data, g);
+	createTotalBar(data, g);
 
 }
 
@@ -88,6 +85,45 @@ function createMajorityBar(data, g) {
 		.style('fill', function(d, i) { return evaluateMajorityColor(data, i); });
 }
 
+/** GROUPED CHART METHODS **/
+function createMaleBar(data, g) {
+	g.selectAll('.maleBar')
+		.data(data.data)
+		.enter()
+		.append('rect')
+		.attr('class', 'maleBar')
+		.attr('x', function(d) { return constant.x(d.state) + 4; })
+		.attr('y', function(d, i) { return constant.y(getMaleVals(data, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(data, i)); })
+		.attr('width', constant.x.bandwidth()/3)
+		.style('fill', data.colors[1]);
+}
+
+function createFemaleBar(data, g) {
+	g.selectAll('.femaleBar')
+		.data(data.data)
+		.enter()
+		.append('rect')
+		.attr('class', 'femaleBar')
+		.attr('x', function(d) { return constant.x(d.state); })
+		.attr('y', function(d, i) { return constant.y(getFemaleVals(data, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(data, i)); })
+		.attr('width', constant.x.bandwidth()/3)
+		.style('fill', data.colors[2]);
+}
+
+function createTotalBar(data, g) {
+	g.selectAll('.totalBar')
+		.data(data.data)
+		.enter()
+		.append('rect')
+		.attr('class', 'totalBar')
+		.attr('x', function(d) { return constant.x(d.state) + 8; })
+		.attr('y', function(d, i) { return constant.y(getTotalVals(data, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(data, i)); })
+		.attr('width', constant.x.bandwidth()/3)
+		.style('fill', data.colors[0]);
+}
 
 /** STATIC ELEMENTS **/
 function createScale(data, g) {
@@ -174,14 +210,29 @@ function createSource(data, svg){
 	let source = svg.append('g')
 		.attr('class', 'source');
 	source.append('text')
-		.attr('x', 10)
-		.attr('y', 390)
+		.attr('x', 30)
+		.attr('y', 350)
 		.attr('text-anchor', 'left')
 		.style('font', '10px monospace')
 		.text('Source: ' + data.source);
 }
 
 /** HELPER FUNCTIONS **/
+// get male values
+function getMaleVals(data, val) {
+	return +data.data[val].values[0].value;
+}
+
+// get female values
+function getFemaleVals(data, val) {
+	return +data.data[val].values[1].value;
+}
+
+// get total values
+function getTotalVals(data, val) {
+	return +data.data[val].values[0].value + +data.data[val].values[1].value;
+}
+
 // evaluate minority value
 function evaluateMinorityVal(data, val) {
 	let maleVals = +data.data[val].values[0].value;
@@ -228,10 +279,14 @@ function evaluateMajorityColor(data, val) {
 		}
 }
 
+/** USER INTERACTION EVENTS **/
+
+
 // kick off xhr
 getData();
 
 //additions
-// - transition between stacked and grouped bar chart
-// - animation between stacked and grouped bar chart
-// - add tooltips
+// - tooltips on hover/focus, extendable
+// - transition between grouped and stacked
+// - table with additional information on senatorsß
+// - call this data from pro publica API

@@ -8,6 +8,7 @@
 		<script src="
 	https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.1/d3.js"></script>
 		<link href="https://fonts.googleapis.com/css?family=Archivo" rel="stylesheet">
+		<link rel="stylesheet" href="styles.css">
 		<script src="script.js"></script>
 	</head>
 	<body>
@@ -16,10 +17,15 @@
 			<h1 class="title">CongressPop</h1>
 		</header>
 
-		<!-- Chart -->
+		<!-- RADIO BUTTONS -->
+		<div class="button-group">
+			<input name="mode" type="radio" value="Stacked" id="stacked-bar-button" checked><label for="stacked-bar-button"> Stacked</label>
+	  		<input name="mode" type="radio" value="Grouped" id="grouped-bar-button"><label for="grouped-bar-button">Grouped</label>
+  		</div>
+
+		<!-- CHART -->
 		<div class="chart-container">
-			<svg class="chart" viewBox="0 0 600 400"
-	  preserveAspectRatio="xMidYMin meet"></svg>
+			<svg class="chart" viewBox="0 0 600 390" preserveAspectRatio="xMidYMin meet"></svg>
 		</div>
 	</body>
 </html>
