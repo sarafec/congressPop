@@ -166,9 +166,7 @@ function createTotalBar(data, g) {
 
 /** TRANSITION FUNCTIONS **/
 function transitionToGrouped() {
-	let svg =  d3.select('.chart'),
-		g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
+	let svg =  d3.select('.chart');
 
 	let toGroupedChart = d3.transition()
 		.duration(1000)
@@ -207,14 +205,14 @@ function transitionToGrouped() {
 			.attr('y', function(d, i) { return constant.y(getTotalVals(refData, i)); })
 			.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(refData, i)); });
 	} else {
+		let g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 		return createGroupChart(refData, g);
 	}
 
 }
 
 function transitionToStacked() {
-	let svg =  d3.select('.chart'),
-		g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+	let svg =  d3.select('.chart'); 
 
 	let toStackedChart = d3.transition()
 		.duration(1000)
@@ -254,6 +252,7 @@ function transitionToStacked() {
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(refData, i)); })
 		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(refData, i)); });
 	} else {
+		let g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 		return createStackChart(refData, g);
 	}
 
@@ -431,7 +430,6 @@ radioButtons.addEventListener('change', function(evt){
 getData();
 
 //additions
-// - transition between grouped and stacked
 // - tooltips on hover/focus, extendable
 // - table with additional information on senators
 // - call this data from pro publica API
