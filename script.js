@@ -74,11 +74,13 @@ function createMinorityBar(data, g) {
 		.append('rect')
 		.attr('class', 'bar1')
 		.attr('x', function(d) { return constant.x(d.state); })
-		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(data, i)); })
+		.attr('y', function(d) { return constant.y(0); })
+		.attr('height', 0)
+		.attr('width', constant.x.bandwidth())
 		.style('fill', data.colors[0])
 		.transition(buildTransition)
-		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(data, i)) ;})
-		.attr('width', constant.x.bandwidth());
+		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(data, i)); })
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(data, i)) ;});
 }
 
 function createMajorityBar(data, g) {
@@ -93,55 +95,77 @@ function createMajorityBar(data, g) {
 		.append('rect')
 		.attr('class', 'bar2')
 		.attr('x', function(d) { return constant.x(d.state); })
-		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(data, i)); })
+		.attr('y', function(d) { return constant.y(0); })
+		.attr('height', 0)
+		.attr('width', constant.x.bandwidth())
 		.style('fill', function(d, i) { return evaluateMajorityColor(data, i); })
 		.transition(buildTransition)
-		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(data, i)); })
-		.attr('width', constant.x.bandwidth());
+		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(data, i)); })
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(data, i)); });
 }
 
 /** GROUPED CHART METHODS **/
 function createMaleBar(data, g) {
+	let buildTransition = d3.transition()
+		.duration(1000)
+		.ease(d3.easeLinear);
+
 	g.selectAll('.maleBar')
 		.data(data.data)
 		.enter()
 		.append('rect')
 		.attr('class', 'maleBar')
 		.attr('x', function(d) { return constant.x(d.state) + 3; })
-		.attr('y', function(d, i) { return constant.y(getMaleVals(data, i)); })
-		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(data, i)); })
+		.attr('y', function(d) { return constant.y(0); })
+		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
-		.style('fill', data.colors[1]);
+		.style('fill', data.colors[1])
+		.transition(buildTransition)
+		.attr('y', function(d, i) { return constant.y(getMaleVals(data, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(data, i)); });
 }
 
 function createFemaleBar(data, g) {
+	let buildTransition = d3.transition()
+		.duration(1000)
+		.ease(d3.easeLinear);
+
 	g.selectAll('.femaleBar')
 		.data(data.data)
 		.enter()
 		.append('rect')
 		.attr('class', 'femaleBar')
 		.attr('x', function(d) { return constant.x(d.state) - 0.25; })
-		.attr('y', function(d, i) { return constant.y(getFemaleVals(data, i)); })
-		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(data, i)); })
+		.attr('y', function(d) { return constant.y(0); })
+		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
-		.style('fill', data.colors[2]);
+		.style('fill', data.colors[2])
+		.transition(buildTransition)
+		.attr('y', function(d, i) { return constant.y(getFemaleVals(data, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(data, i)); });
 }
 
 function createTotalBar(data, g) {
+	let buildTransition = d3.transition()
+		.duration(1000)
+		.ease(d3.easeLinear);
+
 	g.selectAll('.totalBar')
 		.data(data.data)
 		.enter()
 		.append('rect')
 		.attr('class', 'totalBar')
 		.attr('x', function(d) { return constant.x(d.state) + 6; })
-		.attr('y', function(d, i) { return constant.y(getTotalVals(data, i)); })
-		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(data, i)); })
+		.attr('y', function(d) { return constant.y(0); })
+		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
-		.style('fill', data.colors[0]);
+		.style('fill', data.colors[0])
+		.transition(buildTransition)
+		.attr('y', function(d, i) { return constant.y(getTotalVals(data, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(data, i)); });
 }
 
 /** TRANSITION FUNCTIONS **/
-// if possible, collapse into one reusable transition function
 function transitionToGrouped() {
 	let svg =  d3.select('.chart'),
 		g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
@@ -151,10 +175,19 @@ function transitionToGrouped() {
 		.duration(1000)
 		.ease(d3.easeLinear);
 
-	d3.selectAll('.bar1').transition(toGroupedChart)
-		.attr('width', 0);
-	d3.selectAll('.bar2').transition(toGroupedChart)
-		.attr('width', 0);
+	d3.selectAll('.bar1')
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(refData, i)); })
+		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(refData, i)); })
+		.transition(toGroupedChart)
+		.attr('height', 0)
+		.attr('y', function(d) { return constant.y(0); });
+	d3.selectAll('.bar2')
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(refData, i)); })
+		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(refData, i)); })
+		.transition(toGroupedChart)
+		.attr('height', 0)
+		.attr('y', function(d) { return constant.y(0); });
+
 
 	return createGroupChart(refData, g);
 }
@@ -167,12 +200,25 @@ function transitionToStacked() {
 		.duration(1000)
 		.ease(d3.easeLinear);
 
-	d3.selectAll('.maleBar').transition(toStackedChart)
-		.attr('width', 0);
-	d3.selectAll('.femaleBar').transition(toStackedChart)
-		.attr('width', 0);
-	d3.selectAll('.totalBar').transition(toStackedChart)
-		.attr('width', 0);
+	d3.selectAll('.maleBar')
+		.attr('y', function(d, i) { return constant.y(getMaleVals(refData, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(refData, i)); })
+		.transition(toStackedChart)
+		.attr('height', 0)
+		.attr('y', function(d) { return constant.y(0); });
+	d3.selectAll('.femaleBar')
+		.attr('y', function(d, i) { return constant.y(getFemaleVals(refData, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(refData, i)); })
+		.transition(toStackedChart)
+		.attr('height', 0)
+		.attr('y', function(d) { return constant.y(0); });
+	d3.selectAll('.totalBar')
+		.attr('y', function(d, i) { return constant.y(getTotalVals(refData, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(refData, i)); })
+		.transition(toStackedChart)
+		.attr('height', 0)
+		.attr('y', function(d) { return constant.y(0); });
+
 
 	return createStackChart(refData, g);
 }
@@ -288,6 +334,8 @@ function getTotalVals(data, val) {
 
 // evaluate minority value
 function evaluateMinorityVal(data, val) {
+	console.log(data);
+
 	let maleVals = +data.data[val].values[0].value;
 	let femaleVals = +data.data[val].values[1].value;
 	let totalVals = maleVals + femaleVals;
