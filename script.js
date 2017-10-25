@@ -31,7 +31,6 @@ let refData;
 
 // kick off chart creation
 function createInitialElems(data) {
-	console.log(data);
 	// create static chart elems
 	let svg =  d3.select('.chart');
 	let g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
@@ -188,8 +187,29 @@ function transitionToGrouped() {
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
 
+	if (document.querySelector('.maleBar')) {
+		d3.selectAll('.maleBar')
+			.attr('height', 0)
+			.attr('y', function(d) { return constant.y(0); })
+			.transition(toGroupedChart)
+			.attr('y', function(d, i) { return constant.y(getMaleVals(refData, i)); })
+			.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(refData, i)); });
+		d3.selectAll('.femaleBar')
+			.attr('height', 0)
+			.attr('y', function(d) { return constant.y(0); })
+			.transition(toGroupedChart)
+			.attr('y', function(d, i) { return constant.y(getFemaleVals(refData, i)); })
+			.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(refData, i)); });
+		d3.selectAll('.totalBar')
+			.attr('height', 0)
+			.attr('y', function(d) { return constant.y(0); })
+			.transition(toGroupedChart)
+			.attr('y', function(d, i) { return constant.y(getTotalVals(refData, i)); })
+			.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(refData, i)); });
+	} else {
+		return createGroupChart(refData, g);
+	}
 
-	return createGroupChart(refData, g);
 }
 
 function transitionToStacked() {
@@ -219,8 +239,24 @@ function transitionToStacked() {
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
 
+	if (document.querySelector('.bar1')) {
+		d3.selectAll('.bar1')
+		.attr('height', 0)
+		.attr('y', function(d) { return constant.y(0); })
+		.transition(toStackedChart)
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(refData, i)); })
+		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(refData, i)); });
+		
+		d3.selectAll('.bar2')
+		.attr('height', 0)
+		.attr('y', function(d) { return constant.y(0); })
+		.transition(toStackedChart)
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(refData, i)); })
+		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(refData, i)); });
+	} else {
+		return createStackChart(refData, g);
+	}
 
-	return createStackChart(refData, g);
 }
 
 
@@ -334,8 +370,6 @@ function getTotalVals(data, val) {
 
 // evaluate minority value
 function evaluateMinorityVal(data, val) {
-	console.log(data);
-
 	let maleVals = +data.data[val].values[0].value;
 	let femaleVals = +data.data[val].values[1].value;
 	let totalVals = maleVals + femaleVals;
