@@ -27,6 +27,20 @@ let constant = {
 	y: d3.scaleLinear().rangeRound([300 - margin.top - margin.bottom, 0])
 };
 
+let stackedTooltip = d3.select('body')
+	.append('div')
+	.style('position', 'absolute')
+	.style('z-index', '10')
+	.style('visibility', 'hidden')
+	.text('stacked');
+
+let groupedTooltip = d3.select('body')
+	.append('div')
+	.style('position', 'absolute')
+	.style('z-index', '10')
+	.style('visibility', 'hidden')
+	.text('grouped');
+
 let refData;
 
 // kick off chart creation
@@ -77,6 +91,9 @@ function createMinorityBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth())
 		.style('fill', data.colors[0])
+		.on('mouseover', function() { return stackedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function() { return stackedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
+		.on('mouseout', function() { return stackedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(data, i)); })
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(data, i)) ;});
@@ -98,6 +115,9 @@ function createMajorityBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth())
 		.style('fill', function(d, i) { return evaluateMajorityColor(data, i); })
+		.on('mouseover', function() { return stackedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function() { return stackedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
+		.on('mouseout', function() { return stackedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(data, i)); })
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(data, i)); });
@@ -119,6 +139,9 @@ function createMaleBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[1])
+		.on('mouseover', function() { return groupedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function() { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
+		.on('mouseout', function() { return groupedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getMaleVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(data, i)); });
@@ -139,6 +162,9 @@ function createFemaleBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[2])
+		.on('mouseover', function() { return groupedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function() { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
+		.on('mouseout', function() { return groupedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getFemaleVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(data, i)); });
@@ -159,6 +185,9 @@ function createTotalBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[0])
+		.on('mouseover', function() { return groupedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function() { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
+		.on('mouseout', function() { return groupedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getTotalVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(data, i)); });
@@ -185,6 +214,7 @@ function transitionToGrouped() {
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
 
+	// if grouped bar chart exists, change height
 	if (document.querySelector('.maleBar')) {
 		d3.selectAll('.maleBar')
 			.attr('height', 0)
@@ -204,6 +234,8 @@ function transitionToGrouped() {
 			.transition(toGroupedChart)
 			.attr('y', function(d, i) { return constant.y(getTotalVals(refData, i)); })
 			.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(refData, i)); });
+	
+	// if grouped bar chart does not exist, create grouped bar chart
 	} else {
 		let g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 		return createGroupChart(refData, g);
@@ -237,6 +269,7 @@ function transitionToStacked() {
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
 
+	// if stacked bar chart exists, change height
 	if (document.querySelector('.bar1')) {
 		d3.selectAll('.bar1')
 		.attr('height', 0)
@@ -251,6 +284,8 @@ function transitionToStacked() {
 		.transition(toStackedChart)
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(refData, i)); })
 		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(refData, i)); });
+	
+	// if stacked bar chart does not exist, create stacked bar chart
 	} else {
 		let g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 		return createStackChart(refData, g);
