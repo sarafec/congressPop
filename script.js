@@ -29,17 +29,17 @@ let constant = {
 
 let stackedTooltip = d3.select('body')
 	.append('div')
+	.attr('class', 'stacked-tooltip')
 	.style('position', 'absolute')
 	.style('z-index', '10')
-	.style('visibility', 'hidden')
-	.text('stacked');
+	.style('visibility', 'hidden');
 
 let groupedTooltip = d3.select('body')
 	.append('div')
+	.attr('class', 'grouped-tooltip')
 	.style('position', 'absolute')
 	.style('z-index', '10')
-	.style('visibility', 'hidden')
-	.text('grouped');
+	.style('visibility', 'hidden');
 
 let refData;
 
@@ -91,9 +91,9 @@ function createMinorityBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth())
 		.style('fill', data.colors[0])
-		.on('mouseover', function() { return stackedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function() { return stackedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
-		.on('mouseout', function() { return stackedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return stackedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return stackedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)) })
+		.on('mouseout', function(d) { return stackedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(data, i)); })
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(data, i)) ;});
@@ -115,9 +115,9 @@ function createMajorityBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth())
 		.style('fill', function(d, i) { return evaluateMajorityColor(data, i); })
-		.on('mouseover', function() { return stackedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function() { return stackedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
-		.on('mouseout', function() { return stackedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return stackedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return stackedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)) })
+		.on('mouseout', function(d) { return stackedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(data, i)); })
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(data, i)); });
@@ -139,9 +139,9 @@ function createMaleBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[1])
-		.on('mouseover', function() { return groupedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function() { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
-		.on('mouseout', function() { return groupedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return groupedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
+		.on('mouseout', function(d) { return groupedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getMaleVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(data, i)); });
@@ -162,9 +162,9 @@ function createFemaleBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[2])
-		.on('mouseover', function() { return groupedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function() { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
-		.on('mouseout', function() { return groupedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return groupedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
+		.on('mouseout', function(d) { return groupedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getFemaleVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(data, i)); });
@@ -185,9 +185,9 @@ function createTotalBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[0])
-		.on('mouseover', function() { return groupedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function() { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px'); })
-		.on('mouseout', function() { return groupedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return groupedTooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
+		.on('mouseout', function(d) { return groupedTooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getTotalVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(data, i)); });
@@ -446,6 +446,14 @@ function evaluateMajorityColor(data, val) {
 		} else if(maleVals === femaleVals){
 			return data.colors[0];
 		}
+}
+
+function getTooltipText(data, val) {
+	let maleVals = +data.data[val].values[0].value;
+	let femaleVals = +data.data[val].values[1].value;
+	let state = data.data[val].state;
+
+	return 'Men: ' + maleVals + '<br>' + 'Women: ' + femaleVals + '<br>' + state;
 }
 
 /** USER INTERACTION EVENTS **/
