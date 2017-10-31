@@ -473,6 +473,5 @@ radioButtons.addEventListener('change', function(evt){
 getData();
 
 //additions
-// - tooltips on hover/focus, extendable
 // - table with additional information on senators
 // - call this data from pro publica API
