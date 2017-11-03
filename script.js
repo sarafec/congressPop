@@ -41,6 +41,8 @@ let groupedTooltip = d3.select('body')
 	.style('z-index', '10')
 	.style('visibility', 'hidden');
 
+// global data object
+// note - what needs to change to remove this?
 let refData;
 
 // kick off chart creation
@@ -448,6 +450,7 @@ function evaluateMajorityColor(data, val) {
 		}
 }
 
+// format tooltip text
 function getTooltipText(data, val) {
 	let maleVals = +data.data[val].values[0].value;
 	let femaleVals = +data.data[val].values[1].value;
@@ -457,6 +460,7 @@ function getTooltipText(data, val) {
 }
 
 /** USER INTERACTION EVENTS **/
+// change from stacked to group bar chart, or vice versa
 let radioButtons = document.querySelector('.button-group');
 radioButtons.addEventListener('change', function(evt){
 	let chartType = evt.target.defaultValue;
@@ -472,6 +476,14 @@ radioButtons.addEventListener('change', function(evt){
 // kick off xhr
 getData();
 
-//additions
-// - table with additional information on senators
-// - call this data from pro publica API
+// explore
+// 1 - can we clean up transition fucntions?
+// 2 - can we remove tooltip functions from main chart functions?
+// 3 - can we remove the global refData variable?
+// 4 - can we have a single tooltip for both chart types?
+
+// todo
+// add congress bios
+// add data table to ui 
+// link data table and charts via data attributes - use unique identifiers
+
