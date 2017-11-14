@@ -1,20 +1,9 @@
 // perform xhr on json file
 function getData(){
-	let request = new XMLHttpRequest();
-	request.open('GET', 'congress.json', true);
-	request.onload = function() {
-		if (request.status >= 200 && request.status < 400) {
-			let data = JSON.parse(request.responseText);
-			refData = data;
-			createInitialElems(data);
-		} else {
-			console.log('error!');
-		}
-	};
-	request.onerror = function() {
-		console.log('connection error!');
-	};
-	request.send();
+	d3.json('congress.json', function(error, data){
+		constant.refData = data;
+		createInitialElems(data);
+	});
 }
 
 /** CONSTANTS **/
@@ -24,26 +13,16 @@ let constant = {
 	width: 600 - margin.left - margin.right,
 	height: 300 - margin.top - margin.bottom,
 	x: d3.scaleBand().rangeRound([0, 600 - margin.left - margin.right]).padding(0.05),
-	y: d3.scaleLinear().rangeRound([300 - margin.top - margin.bottom, 0])
+	y: d3.scaleLinear().rangeRound([300 - margin.top - margin.bottom, 0]),
+	refData: {}
 };
 
-let stackedTooltip = d3.select('body')
+let tooltip = d3.select('body')
 	.append('div')
-	.attr('class', 'stacked-tooltip')
+	.attr('class', 'tooltip')
 	.style('position', 'absolute')
 	.style('z-index', '10')
 	.style('visibility', 'hidden');
-
-let groupedTooltip = d3.select('body')
-	.append('div')
-	.attr('class', 'grouped-tooltip')
-	.style('position', 'absolute')
-	.style('z-index', '10')
-	.style('visibility', 'hidden');
-
-// global data object
-// note - what needs to change to remove this?
-let refData;
 
 // kick off chart creation
 function createInitialElems(data) {
@@ -93,9 +72,9 @@ function createMinorityBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth())
 		.style('fill', data.colors[0])
-		.on('mouseover', function(d) { return stackedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function(d, i) { return stackedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)) })
-		.on('mouseout', function(d) { return stackedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)) })
+		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(data, i)); })
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(data, i)) ;});
@@ -117,9 +96,9 @@ function createMajorityBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth())
 		.style('fill', function(d, i) { return evaluateMajorityColor(data, i); })
-		.on('mouseover', function(d) { return stackedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function(d, i) { return stackedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)) })
-		.on('mouseout', function(d) { return stackedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)) })
+		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(data, i)); })
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(data, i)); });
@@ -141,9 +120,9 @@ function createMaleBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[1])
-		.on('mouseover', function(d) { return groupedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function(d, i) { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
-		.on('mouseout', function(d) { return groupedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
+		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getMaleVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(data, i)); });
@@ -164,9 +143,9 @@ function createFemaleBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[2])
-		.on('mouseover', function(d) { return groupedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function(d, i) { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
-		.on('mouseout', function(d) { return groupedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
+		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getFemaleVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(data, i)); });
@@ -187,9 +166,9 @@ function createTotalBar(data, g) {
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
 		.style('fill', data.colors[0])
-		.on('mouseover', function(d) { return groupedTooltip.style('visibility', 'visible'); })
-		.on('mousemove', function(d, i) { return groupedTooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
-		.on('mouseout', function(d) { return groupedTooltip.style('visibility', 'hidden'); })
+		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
+		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
+		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
 		.transition(buildTransition)
 		.attr('y', function(d, i) { return constant.y(getTotalVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(data, i)); });
@@ -204,14 +183,14 @@ function transitionToGrouped() {
 		.ease(d3.easeLinear);
 
 	d3.selectAll('.bar1')
-		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(refData, i)); })
-		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(refData, i)); })
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(constant.refData, i)); })
+		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(constant.refData, i)); })
 		.transition(toGroupedChart)
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
 	d3.selectAll('.bar2')
-		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(refData, i)); })
-		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(refData, i)); })
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(constant.refData, i)); })
+		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(constant.refData, i)); })
 		.transition(toGroupedChart)
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
@@ -222,51 +201,51 @@ function transitionToGrouped() {
 			.attr('height', 0)
 			.attr('y', function(d) { return constant.y(0); })
 			.transition(toGroupedChart)
-			.attr('y', function(d, i) { return constant.y(getMaleVals(refData, i)); })
-			.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(refData, i)); });
+			.attr('y', function(d, i) { return constant.y(getMaleVals(constant.refData, i)); })
+			.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(constant.refData, i)); });
 		d3.selectAll('.femaleBar')
 			.attr('height', 0)
 			.attr('y', function(d) { return constant.y(0); })
 			.transition(toGroupedChart)
-			.attr('y', function(d, i) { return constant.y(getFemaleVals(refData, i)); })
-			.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(refData, i)); });
+			.attr('y', function(d, i) { return constant.y(getFemaleVals(constant.refData, i)); })
+			.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(constant.refData, i)); });
 		d3.selectAll('.totalBar')
 			.attr('height', 0)
 			.attr('y', function(d) { return constant.y(0); })
 			.transition(toGroupedChart)
-			.attr('y', function(d, i) { return constant.y(getTotalVals(refData, i)); })
-			.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(refData, i)); });
+			.attr('y', function(d, i) { return constant.y(getTotalVals(constant.refData, i)); })
+			.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(constant.refData, i)); });
 	
 	// if grouped bar chart does not exist, create grouped bar chart
 	} else {
 		let g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-		return createGroupChart(refData, g);
+		return createGroupChart(constant.refData, g);
 	}
 
 }
 
 function transitionToStacked() {
-	let svg =  d3.select('.chart'); 
+	let svg =  d3.select('.chart');
 
 	let toStackedChart = d3.transition()
 		.duration(1000)
 		.ease(d3.easeLinear);
 
 	d3.selectAll('.maleBar')
-		.attr('y', function(d, i) { return constant.y(getMaleVals(refData, i)); })
-		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(refData, i)); })
+		.attr('y', function(d, i) { return constant.y(getMaleVals(constant.refData, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(constant.refData, i)); })
 		.transition(toStackedChart)
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
 	d3.selectAll('.femaleBar')
-		.attr('y', function(d, i) { return constant.y(getFemaleVals(refData, i)); })
-		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(refData, i)); })
+		.attr('y', function(d, i) { return constant.y(getFemaleVals(constant.refData, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(constant.refData, i)); })
 		.transition(toStackedChart)
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
 	d3.selectAll('.totalBar')
-		.attr('y', function(d, i) { return constant.y(getTotalVals(refData, i)); })
-		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(refData, i)); })
+		.attr('y', function(d, i) { return constant.y(getTotalVals(constant.refData, i)); })
+		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(constant.refData, i)); })
 		.transition(toStackedChart)
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); });
@@ -277,20 +256,20 @@ function transitionToStacked() {
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); })
 		.transition(toStackedChart)
-		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(refData, i)); })
-		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(refData, i)); });
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(constant.refData, i)); })
+		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(constant.refData, i)); });
 		
 		d3.selectAll('.bar2')
 		.attr('height', 0)
 		.attr('y', function(d) { return constant.y(0); })
 		.transition(toStackedChart)
-		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(refData, i)); })
-		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(refData, i)); });
+		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(constant.refData, i)); })
+		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(constant.refData, i)); });
 	
 	// if stacked bar chart does not exist, create stacked bar chart
 	} else {
 		let g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-		return createStackChart(refData, g);
+		return createStackChart(constant.refData, g);
 	}
 
 }
@@ -479,11 +458,3 @@ getData();
 // explore
 // 1 - can we clean up transition fucntions?
 // 2 - can we remove tooltip functions from main chart functions?
-// 3 - can we remove the global refData variable?
-// 4 - can we have a single tooltip for both chart types?
-
-// todo
-// add congress bios
-// add data table to ui 
-// link data table and charts via data attributes - use unique identifiers
-
