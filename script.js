@@ -24,6 +24,7 @@ let tooltip = d3.select('body')
 	.style('z-index', '10')
 	.style('visibility', 'hidden');
 
+
 // kick off chart creation
 function createInitialElems(data) {
 	// create static chart elems
@@ -57,7 +58,7 @@ function createGroupChart(data, g) {
 
 /** STACK CHART METHODS **/
 function createMinorityBar(data, g) {
-	let buildTransition = d3.transition()
+	let stackedTransition = d3.transition()
 		.duration(1000)
 		.ease(d3.easeLinear);
 
@@ -75,13 +76,13 @@ function createMinorityBar(data, g) {
 		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
 		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)) })
 		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
-		.transition(buildTransition)
+		.transition(stackedTransition)
 		.attr('y', function(d, i) { return constant.y(evaluateMinorityVal(data, i)); })
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateMinorityVal(data, i)) ;});
 }
 
 function createMajorityBar(data, g) {
-	let buildTransition = d3.transition()
+	let stackedTransition = d3.transition()
 		.duration(1000)
 		.ease(d3.easeLinear);
 
@@ -99,14 +100,14 @@ function createMajorityBar(data, g) {
 		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
 		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)) })
 		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
-		.transition(buildTransition)
+		.transition(stackedTransition)
 		.attr('y', function(d, i) { return constant.y(evaluateTotalVal(data, i)); })
 		.attr('height', function(d, i) { return constant.height - constant.y(evaluateTotalVal(data, i)); });
 }
 
 /** GROUPED CHART METHODS **/
 function createMaleBar(data, g) {
-	let buildTransition = d3.transition()
+	let groupedTransition = d3.transition()
 		.duration(1000)
 		.ease(d3.easeLinear);
 
@@ -123,13 +124,13 @@ function createMaleBar(data, g) {
 		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
 		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
 		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
-		.transition(buildTransition)
+		.transition(groupedTransition)
 		.attr('y', function(d, i) { return constant.y(getMaleVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getMaleVals(data, i)); });
 }
 
 function createFemaleBar(data, g) {
-	let buildTransition = d3.transition()
+	let groupedTransition = d3.transition()
 		.duration(1000)
 		.ease(d3.easeLinear);
 
@@ -146,13 +147,13 @@ function createFemaleBar(data, g) {
 		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
 		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
 		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
-		.transition(buildTransition)
+		.transition(groupedTransition)
 		.attr('y', function(d, i) { return constant.y(getFemaleVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getFemaleVals(data, i)); });
 }
 
 function createTotalBar(data, g) {
-	let buildTransition = d3.transition()
+	let groupedTransition = d3.transition()
 		.duration(1000)
 		.ease(d3.easeLinear);
 
@@ -169,7 +170,7 @@ function createTotalBar(data, g) {
 		.on('mouseover', function(d) { return tooltip.style('visibility', 'visible'); })
 		.on('mousemove', function(d, i) { return tooltip.style('top', (event.pageY - 10) + 'px').style('left', (event.pageX + 10) + 'px').html(getTooltipText(data, i)); })
 		.on('mouseout', function(d) { return tooltip.style('visibility', 'hidden'); })
-		.transition(buildTransition)
+		.transition(groupedTransition)
 		.attr('y', function(d, i) { return constant.y(getTotalVals(data, i)); })
 		.attr('height', function(d, i){ return constant.height - constant.y(getTotalVals(data, i)); });
 }
@@ -457,4 +458,3 @@ getData();
 
 // explore
 // 1 - can we clean up transition fucntions?
-// 2 - can we remove tooltip functions from main chart functions?
