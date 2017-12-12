@@ -67,7 +67,7 @@ function createMinorityBar(data, g) {
 		.enter()
 		.append('rect')
 		.attr('class', 'bar1')
-		.attr('x', function(d) { return constant.x(d.state); })
+		.attr('x', function(d) { return constant.x(d.abbreviation); })
 		.attr('y', function(d) { return constant.y(0); })
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth())
@@ -91,7 +91,7 @@ function createMajorityBar(data, g) {
 		.enter()
 		.append('rect')
 		.attr('class', 'bar2')
-		.attr('x', function(d) { return constant.x(d.state); })
+		.attr('x', function(d) { return constant.x(d.abbreviation); })
 		.attr('y', function(d) { return constant.y(0); })
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth())
@@ -115,7 +115,7 @@ function createMaleBar(data, g) {
 		.enter()
 		.append('rect')
 		.attr('class', 'maleBar')
-		.attr('x', function(d) { return constant.x(d.state) + 3; })
+		.attr('x', function(d) { return constant.x(d.abbreviation) + 3; })
 		.attr('y', function(d) { return constant.y(0); })
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
@@ -138,7 +138,7 @@ function createFemaleBar(data, g) {
 		.enter()
 		.append('rect')
 		.attr('class', 'femaleBar')
-		.attr('x', function(d) { return constant.x(d.state) - 0.25; })
+		.attr('x', function(d) { return constant.x(d.abbreviation) - 0.25; })
 		.attr('y', function(d) { return constant.y(0); })
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
@@ -161,7 +161,7 @@ function createTotalBar(data, g) {
 		.enter()
 		.append('rect')
 		.attr('class', 'totalBar')
-		.attr('x', function(d) { return constant.x(d.state) + 6; })
+		.attr('x', function(d) { return constant.x(d.abbreviation) + 6; })
 		.attr('y', function(d) { return constant.y(0); })
 		.attr('height', 0)
 		.attr('width', constant.x.bandwidth()/3)
@@ -277,7 +277,7 @@ function transitionToStacked() {
 
 /** STATIC ELEMENTS **/
 function createScale(data, g) {
-	constant.x.domain(data.data.map(function(d) { return d.state; }));
+	constant.x.domain(data.data.map(function(d) { return d.abbreviation; }));
 	// note - fix max domain value
 	constant.y.domain([0, 53]);
 
@@ -294,7 +294,7 @@ function createScale(data, g) {
 
 	// transform text on x axis
 	g.selectAll('.x-axis text')
-		.style('transform', 'translateY(38px) translateX(-13px) rotate(-90deg)');
+		.style('transform', 'translateY(20px) translateX(-13px) rotate(-90deg)');
 
 	// define y axis
 	g.append('g')
